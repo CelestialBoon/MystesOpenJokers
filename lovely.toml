@@ -1,0 +1,42 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Add Four Fingers functionality to Four Fingered Discount
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = '''local four_fingers = next(find_joker('Four Fingers'))'''
+position = "at"
+payload = '''
+local four_fingers = next(find_joker('Four Fingers')) or next(find_joker('Four Finger Discount'))'''
+match_indent = true
+overwrite = true
+
+# Add Shortcut functionality to Four Fingered Discount
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = '''local can_skip = next(find_joker('Shortcut'))'''
+position = "at"
+payload = '''
+local can_skip = next(find_joker('Shortcut')) or next(find_joker('Four Finger Discount'))'''
+match_indent = true
+overwrite = true
+        
+# Wild Cards cannot be debuffed
+[[patches]]
+[patches.pattern]
+target = "blind.lua"
+pattern = '''if self.debuff and not self.disabled and card.area ~= G.jokers then'''
+position = "before"
+payload = '''
+if card.area ~= G.jokers and card.ability.name == 'Wild Card' then
+    card:set_debuff(false)
+    return
+end
+'''
+match_indent = true
+overwrite = false
+
